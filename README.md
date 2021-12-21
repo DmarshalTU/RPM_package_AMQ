@@ -1,4 +1,4 @@
-# ActiveMQ RPM
+# RPM
 
 The work flow to create RPM package and install the Apache ActiveMQ open source message broker.
 
@@ -29,7 +29,7 @@ rpmbuild/
 wget https://www.apache.org/dyn/closer.cgi?filename=/activemq/5.16.3/apache-activemq-5.16.3-bin.tar.gz&action=download -O rpm/SOURCES/apache-activemq-5.16.3-bin.tar.gz
 ```
 
-### Create the RPM spec file:
+### Create the RPM spec file with out JAVA:
 
 ```bash
 rpmdev-newspec activemq.spec
@@ -74,6 +74,58 @@ tar xvf /ActiveMQ/activemq-5.16.3.tar.gz -C /ActiveMQ/
 %files
 /ActiveMQ/
 
+```
+### With JAVA
+
+add java-sdk to rpmbuild/SOURCE folder:
+```bash
+wget https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz
+```
+
+```vim
+Name:           activemq_ojdk11 
+Version:        1
+Release:        1%{?dist}
+Summary:        An RPM installing standalone activeMQ      
+Source0:        openjdk-11.0.2_linux-x64_bin.tar.gz
+Source1:        activemq-5.16.3.tar.gz
+Requires:       gzip
+License:        GPL
+
+%description
+An RPM for installing activemq v5.16.3 which also installs open jdk v11.0.2 without affecting host PATH. 
+
+%prep
+
+
+
+
+%build
+
+
+%install
+[ -d %{buildroot}/ActiveMQ ] && rm -rf %{buildroot}/ActiveMQ
+mkdir %{buildroot}/ActiveMQ/
+cp $RPM_SOURCE_DIR/openjdk-11.0.2_linux-x64_bin.tar.gz %{buildroot}/ActiveMQ/
+cp $RPM_SOURCE_DIR/activemq-5.16.3.tar.gz %{buildroot}/ActiveMQ/
+
+%post
+pwd
+tar xvf /ActiveMQ/openjdk-11.0.2_linux-x64_bin.tar.gz -C /ActiveMQ/
+tar xvf /ActiveMQ/activemq-5.16.3.tar.gz -C /ActiveMQ/
+/ActiveMQ/apache-activemq-5.16.3/bin/activemq start
+
+%preun
+/ActiveMQ/apache-activemq-5.16.3/bin/activemq stop
+
+%files
+/ActiveMQ/
+
+
+
+%changelog
+* Wed Dec  1 2021 root
+- 
 ```
 
 ### Check the spec file for errors:
