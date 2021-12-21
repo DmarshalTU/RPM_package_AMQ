@@ -1,4 +1,4 @@
-# RPM
+# ActiveMQ RPM
 
 The work flow to create RPM package and install the Apache ActiveMQ open source message broker.
 
